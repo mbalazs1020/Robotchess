@@ -1,0 +1,13 @@
+#include <stdio.h>
+#include "modbus/modbus.h"
+
+int main(void)
+{
+	modbus_t node = null;
+
+	printf("Starting Modbus TPC communication:");
+
+	modbus_new_tcp()
+
+	return 0;
+}

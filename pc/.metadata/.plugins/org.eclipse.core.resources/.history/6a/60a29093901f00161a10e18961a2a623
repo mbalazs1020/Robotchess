@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include "modbus/modbus.h"
+
+int main(void)
+{
+	modbus_t *plc = NULL;
+	char* ip = "192.168.0.104";
+	int port = 502;
+
+	printf("Starting Modbus TPC communication: \n");
+
+	plc = modbus_new_tcp(ip, port);
+
+	if( modbus_connect(plc) == -1)
+	{
+		printf("Nyilván nem sikerült még megnyitni, mert nincs senki a másik végén. \n");
+	}
+	else
+	{
+		printf("Ez elég indokolatlan. \n");
+	}
+
+	return 0;
+}
