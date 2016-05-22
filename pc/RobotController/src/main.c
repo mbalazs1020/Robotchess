@@ -1,27 +1,34 @@
 #include <stdio.h>
-#include "modbus/modbus.h"
+#include "types.h"
+#include "consts.h"
+#include "modbus_driver.h"
 
-#define PLC_IP "192.168.0.104"
-#define PORT 502
-
-#define DEBUG_IP "192.168.1.65"
 
 int main(void)
 {
-	modbus_t *plc = NULL;
+	char s[3];
 
-	printf("Starting Modbus TPC communication: \n");
+	printf("Connecting to robot: \n");
 
-	plc = modbus_new_tcp(DEBUG_IP, PORT);
-
-	if( modbus_connect(plc) == -1)
+	// Csatlakozás
+	while( robot_connect(DEBUG_IP, PORT) == false )
 	{
-		printf("Nyilván nem sikerült még megnyitni, mert nincs senki a másik végén. \n");
+		printf("Connection error! \n");
 	}
-	else
+
+
+	while(s != "ex")
 	{
-		printf("Ez elég indokolatlan. \n");
+		printf("Write your input: \n");
+		scanf("%s", s);
+
+		printf("Your input was: %s \n", s);
 	}
+
+	// Kapcsolat bontás
+	robot_disconnect();
+
+	printf("Shutting down...");
 
 	return 0;
 }
