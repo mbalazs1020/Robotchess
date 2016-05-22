@@ -15,11 +15,11 @@ Def Plt 1, pBottomLeft, pBottomRight, pTopLeft, ,8 , 8, 2  ' Sakktábla paletta
 delay = 0.5                ' Delay idő, amelyet minden mozdulat után beteszünk
 endofProgram = 0           ' Program véget érhet bit
 
-' Mozgás pontjai paletta sorszám szerint adva - TODO később memóriából olvasva
+' Mozgás pontjai paletta sorszám szerint adva
 movSource = 1
 movDest   = 2
 
-' Kezdeti tevékenységek
+' Inicializáló tevékenységek
 Servo On    ' Szervók bekapcsolása
 Ovrd 20     ' Sebesség limit %
 goto *main  ' Elküldöm a main-be
@@ -41,7 +41,8 @@ dly delay
 mvs pGoal                 ' Lemegyek
 HClose 1                  ' Becsukom
 dly delay
-mvs pGoal                 ' Feljövök
+mov pGoal, -80            ' Feljövök
+dly delay
 
 ' Célmezőre leteszem a bábut
 pGoal = plt 1, movDest    ' Palettáról leveszem a célhelyet
@@ -51,6 +52,7 @@ mvs pGoal                 ' Lemegyek
 HOpen 1                   ' Kinyitom
 dly delay
 mvs pGoal                 ' Feljövök
+dly delay
 
 ' Vissza a kameranézetre
 mov pObserve
