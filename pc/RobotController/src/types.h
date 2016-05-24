@@ -19,8 +19,10 @@ typedef enum
 typedef enum
 {
 	CMD_ALLOW_MOVE_1 = 0x5353,
-	CMD_ALLOW_MOVE_2 = 0xB9B9,
-	CMD_EXIT         = 0x3333
+	CMD_ALLOW_MOVE_2 = 0x1919,
+	CMD_EXIT         = 0x3333,
+	CMD_CLR_READY    = 0x2,
+	CMD_READY        = 0x457
 } CMD;
 
 

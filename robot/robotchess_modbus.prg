@@ -3,152 +3,139 @@
 ' Menyhárt Balázs
 ' 2016
 ' ------------------------------------------------------------------------
-
 '******************************************
 ' Tanított pontok
 '******************************************
-' pObserve:     Kameraállás
-' pBottomLeft:  Tábla bal alsó sarka
-' pBottomRight: Tábla jobb alsó sarka
-' pTopLeft:     Tábla bal felsõ sarka
-' pDrop:        Ahova a leütött bábut kidobjuk
-
+' pObs :     Kameraállás
+' pBL  :     Tábla bal alsó sarka   (A1)
+' pBR  :     Tábla jobb alsó sarka  (H1)
+' pTL  :     Tábla bal felso sarka  (A8)
+' pDrop:     Ledobóhely
 '******************************************
 ' Kommunikációs protokoll
 '******************************************
-
 ' Üzenetek várt értékei
 allowMoveCmd1      = 21331  ' = 0x5353 - lépés indítás elsõ varázsszáma
-allowMoveCmd2      = 47545  ' = 0xB9B9 - lépés indítás második varázsszáma
+allowMoveCmd2      = 6425  ' = 0x1919 - lépés indítás második varázsszáma
 exitCmd            = 13107  ' = 0x3333 - kilépés parancs
-NormalMove         =    33  ' =   0x21 - normál lépés
-HitMove            =   173  ' =   0xAD - ütéses lépés
-
+normalMove         =    33  ' =   0x21 - normál lépés
+hitMove            =   173  ' =   0xAD - ütéses lépés
+readyClearCmd     = 2 ' = 0x2 - kész törlése parancs
+'Küldött üzenetek
+moveReady  = 1111 ' = 0x457 - lépés kész 
 ' Memóriacímei
-cmd1Addr           = 10800  ' PC: 540
-cmd2Addr           = 10816  ' PC: 541
-movSourceAddr      = 10832  ' PC: 542
-movDestAddr        = 10848  ' PC: 543
-movTypeAddr        = 10864  ' PC: 544
-
-
+nWcmd1Addr           = 10800  ' PC: 540
+nWcmd2Addr           = 10816  ' PC: 541
+nWmovSourceAddr      = 10832  ' PC: 542
+nWmovDestAddr        = 10848  ' PC: 543
+nWmovTypeAddr        = 10864  ' PC: 544
+nWcmdExitAddr        = 10880  ' PC: 545
 '******************************************
 ' Definíciók
 '******************************************
-Def Plt 1, pBottomLeft, pBottomRight, pTopLeft, ,8 , 8, 2  ' Sakktábla paletta
+Def Plt 1, pBL, pBR, pTL, ,8 , 8, 2  ' Sakktábla paletta
 delay = 0.5                ' Delay idõ, amelyet minden mozdulat után beteszünk
+toolDelay = 2             ' Megfogó becsukása elotti delay
 speedlimit = 20            ' Sebesség %
-
+over = -50                 ' Ennyivel megyünk fölé a mezonek
 '******************************************
 ' Inicializálás
 '******************************************
-
 ' Kommunikációban részt vevõ memóriák és bufferek kinullázása
-movSource = 0
-movDest   = 0
-cmd1 = 0
-cmd2 = 0
-moveType = 0
-
-M_Out16(allowMoveCmd1Addr) = 0
-M_Out16(allowMoveCmd2Addr) = 0
-M_Out16(movSourceAddr) = 0
-M_Out16(movDestAddr) = 0
-M_Out16(movTypeAddr) = 0
-
+nWmovSource = 0
+nWmovDest   = 0
+nWcmd1 = 0
+nWcmd2 = 0
+nWmoveType = 0
+nWcmdExit = 0
+nWcmdClrReady = 0
 ' Robot indítása
 Servo On            ' Szervók bekapcsolása
 Ovrd speedlimit     ' Sebesség limit %
-
 ' Main címkére ugrunk, a program ott kezdõdik
 goto *main
-
-
 '******************************************
 ' Lépés - ciklikusan hívódik
 '******************************************
-
 ' Ütéses lépés: elõször levesszük a célmezõrõl a bábut
 *startHitMove
-
-pGoal = Plt 1, movDest    ' Célmezõ helye
-mov pGoal, - 80           ' Megközelítem
+pGoal = Plt 1, nWmovDest    ' Célmezõ helye
+mvs pGoal, over           ' Megközelítem
+dly toolDelay
 HOpen 1                   ' Kinyitom
 dly delay
 mvs pGoal                 ' Lemegyek
+dly toolDelay
 HClose 1                  ' Becsukom
 dly delay
-mov pGoal, -80            ' Feljövök
+mvs pGoal, over           ' Megközelítem
 dly delay
-mov pDrop                 ' Leütött bábu tároló fölé megyek
+mvs pDrop                 ' Leütött bábu tároló fölé megyek
+dly toolDelay
 HOpen 1                   ' Kinyitom
 dly delay
-
 ' Normál lépés ütés nékül
 *startNormalMove
-
-pGoal = Plt 1, movSource  ' Kinduló helyet leveszem a palettáról
-mov pGoal, - 80           ' Megközelítem
+' Kiinduló mezorol felveszem a bábut
+pGoal = Plt 1, nWmovSource  ' Kinduló helyet leveszem a palettáról
+mvs pGoal, over           ' Megközelítem
+dly toolDelay
 HOpen 1                   ' Kinyitom
 dly delay
 mvs pGoal                 ' Lemegyek
+dly toolDelay
 HClose 1                  ' Becsukom
 dly delay
-mov pGoal, -80            ' Feljövök
+mvs pGoal, over            ' Feljövök
 dly delay
-
-pGoal = plt 1, movDest    ' Palettáról leveszem a célhelyet
-mov pGoal, - 80           ' Megközelítem
+' Célmezore leteszem a bábut
+pGoal = plt 1, nWmovDest    ' Palettáról leveszem a célhelyet
+mvs pGoal, over          ' Megközelítem
 dly delay
 mvs pGoal                 ' Lemegyek
+dly toolDelay
 HOpen 1                   ' Kinyitom
 dly delay
-mvs pGoal                 ' Feljövök
+mvs pGoal, over                 ' Feljövök
 dly delay
-
-' Vissza a kameranézetre
-mov pObserve
-dly delay
-
-
+' Lépés végét jelzem
+M_Out16(nWcmd1Addr) = moveReady
+' Várok, hogy a PC visszajelezzen
+*waitforpc
+nWcmdClrReady = M_In16(nWcmd1Addr)
+if nWcmdClrReady <> readyClearCmd then *waitforpc
+M_out(nWcmd1Addr) = 0
 '******************************************
 ' Main programrész - vezérlés
 '******************************************
 *main
-dly delay ' Legyen benne egy kis késleltetés, mert nem sietünk
-
+' Vissza a kameranézetre
+mov pObs
+dly delay
+' Érkezett-e kilépés parancs
+nWcmdExit = M_In16(nWcmdExitAddr)
+if nWcmdExit = exitCmd then *exit
 ' Érkezett parancsot ellenõrzöm
-cmd1 = M_In16(cmd1Addr)
-if cmd1 = exitCmd then *end  ' Kilépés, ha ez van a parancsban
-if cmd1 = allowMoveCmd1 Then ' Ha az elsõ parancs lépésre szólít
-	cmd2 = M_In16(cmd2Addr)
-	if cmd2 = exitCmd then *end  ' Ha a második parancsban kilépés van, akkor kilépek
-	if cmd2 = allowMoveCmd2 Then
-		goto *readMoveParams
-	Else
-		goto *main ' Újrakezdem
-	Endif	
-Else
-	goto *main  ' Újrakezdem
-Endif
-
+nWcmd1 = M_In16(nWcmd1Addr)
+if nWcmd1 = allowMoveCmd1 Then *readsecond ' Ha az elsõ parancs lépésre szólít
+goto *main ' Újrakezdem
+*readsecond
+nWcmd2 = M_In16(nWcmd2Addr)
+if nWcmd2 = allowMoveCmd2 Then *readMoveParams  ' Ha a második parancs lépésre szólít
+goto *main ' Újrakezdem
 ' Ide nem juthatok el:
-goto *end
-
+goto *exit
 ' Beolvasom a lépés paramétereit
-* readMoveParams
-moveType  = M_In16(movTypeAddr)
-movSource = M_In16(movSourceAddr)
-movDest   = M_In16(movDestAddr)
-
+*readMoveParams
+nWmoveType  = M_In16(nWmovTypeAddr)
+nWmovSource = M_In16(nWmovSourceAddr)
+nWmovDest   = M_In16(nWmovDestAddr)
 ' Megfelelõ típusú lépésre ugrok
-if moveType = NormalMove Then *startNormalMove
-if moveType = HitMove Then *startHitMove
-
-
+if nWmoveType = NormalMove Then *startNormalMove
+if nWmoveType = HitMove Then *startHitMove
 '******************************************
 ' Program vége - leállás
 '******************************************
-*end
+*exit
 Servo Off
 End

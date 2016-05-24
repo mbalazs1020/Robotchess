@@ -3,74 +3,61 @@
 ' Menyhárt Balázs
 ' 2016
 ' -------------------------------------
-
 ' Tanított pontok:
 ' pObserve:     Kameraállás
-' pBottomLeft:  Tábla bal alsó sarka
-' pBottomRight: Tábla jobb alsó sarka
-' pTopLeft:     Tábla bal felső sarka
+' pBL:  Tábla bal alsó sarka
+' pBR: Tábla jobb alsó sarka
+' pTL:     Tábla bal felso sarka
 
 ' Definícók
-Def Plt 1, pBottomLeft, pBottomRight, pTopLeft, ,8 , 8, 2  ' Sakktábla paletta
-delay = 0.5                ' Delay idő, amelyet minden mozdulat után beteszünk
+
+Def Plt 1, pBL, pBR, pTL, ,8 , 8, 2  ' Sakktábla paletta
+delay = 0.5                ' Delay ido, amelyet minden mozdulat után beteszünk
+over = -50                 ' Ennyivel megyünk fölé a mezőnek
 endofProgram = 0           ' Program véget érhet bit
-
 ' Mozgás pontjai paletta sorszám szerint adva
-movSource = 1
-movDest   = 2
-
+movSource = 20
+movDest   = 64
 ' Inicializáló tevékenységek
 Servo On    ' Szervók bekapcsolása
 Ovrd 20     ' Sebesség limit %
 goto *main  ' Elküldöm a main-be
-
-
-
-' Lépés itt fog kezdődni
+' Lépés itt fog kezdodni
 *startMove
-
 ' Lépés beolvasása a memóriából
-'data = M_In(10162)   ' Adott memóriacímről így kérünk be
-
-' Kiinduló mezőről felveszem a bábut
+'data = M_In(10162)   ' Adott memóriacímrol így kérünk be
+' Kiinduló mezorol felveszem a bábut
 *goOverField
 pGoal = Plt 1, movSource  ' Kinduló helyet leveszem a palettáról
-mov pGoal, - 80           ' Megközelítem
+mvs pGoal, over           ' Megközelítem
 HOpen 1                   ' Kinyitom
 dly delay
 mvs pGoal                 ' Lemegyek
 HClose 1                  ' Becsukom
 dly delay
-mov pGoal, -80            ' Feljövök
+mvs pGoal, over            ' Feljövök
 dly delay
-
-' Célmezőre leteszem a bábut
+' Célmezore leteszem a bábut
 pGoal = plt 1, movDest    ' Palettáról leveszem a célhelyet
-mov pGoal, - 80           ' Megközelítem
+mvs pGoal, over          ' Megközelítem
 dly delay
 mvs pGoal                 ' Lemegyek
 HOpen 1                   ' Kinyitom
 dly delay
-mvs pGoal                 ' Feljövök
+mvs pGoal, over                 ' Feljövök
 dly delay
-
-' Vissza a kameranézetre
-mov pObserve
-dly delay
-
-' Kiléptető feltétel - PIG ez csak debug
-endofProgram = 1;
-
+' Kilépteto feltétel
+endofProgram = 1
 ' ------------------------------
 ' Main programrész: Innen az elejére ugrok, majd újra ideérek -> ciklus
 *main
-
-if endofProgram = 1 then *end   ' Ha ki kell lépni
-goto *startMove                 ' Kezdjük előről a programot
-
+' Vissza a kameranézetre
+mov pObserve
+dly delay
+if endofProgram = 1 then *exit   ' Ha ki kell lépni
+goto *startMove                 ' Kezdjük elorol a programot
 ' ------------------------------
-
 ' Program vége
-*end
+*exit
 Servo Off
 End

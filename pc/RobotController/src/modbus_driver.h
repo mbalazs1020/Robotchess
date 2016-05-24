@@ -10,8 +10,8 @@ void robot_disconnect(void);
 // Kiküldjük a parancsot
 bool robot_sendCmd(CMD cmd);
 
-// Kiküldjük a lépés pozíciót a robotnak
-bool robot_sendMoveData(MOVE move);
+// Lépés kiküldés és várás
+bool robot_sendMove(MOVE move);
 
 
 #endif
