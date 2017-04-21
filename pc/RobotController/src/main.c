@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "consts.h"
+#include "modbus/modbus.h"
 #include "modbus_driver.h"
 
 
@@ -9,6 +10,7 @@ int main(void)
 	int input = 0;
 	int source = 0;
 	int dest = 0;
+	int i =0;
 	MOVE move;
 
 	printf("Connecting to robot: \n");
@@ -21,6 +23,9 @@ int main(void)
 
 	printf("Connection successful. \n");
 
+	modbusClearCommand();
+
+/*
 	while(input != -1)
 	{
 		int i = 0;
@@ -48,7 +53,7 @@ int main(void)
 	}
 
 	robot_sendCmd(CMD_EXIT);
-
+*/
 	// Kapcsolat bontás
 	robot_disconnect();
 

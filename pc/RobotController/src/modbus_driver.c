@@ -141,3 +141,18 @@ bool robot_sendMove(MOVE move)
 
 	return true;
 }
+
+void modbusClearCommand( void )
+{
+	int i =0;
+	// Memóriák törlése
+	modbus_write_register(plc, ADDR_CMD_1, (REG16) 0 );
+	for( i = 0; i < 1000; i++);
+	modbus_write_register(plc, ADDR_CMD_2, (REG16) 0 );
+	for( i = 0; i < 1000; i++);
+
+	// Megkérem, hogy törölje a kész jelzést
+	robot_sendCmd(CMD_CLR_READY);
+
+	printf("Elvileg töröltem az összes memóriát");
+}
